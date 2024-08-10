@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f0f0f0;
-    overflow-y: scroll; /* Enable vertical scrolling */
+    overflow-y: scroll;
 }
 
 .container {
@@ -13,7 +13,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     max-width: 600px;
     width: 100%;
-    margin: 20px auto; /* Center the container and provide space for scrolling */
+    margin: 20px auto;
 }
 
 h1 {
@@ -23,10 +23,11 @@ h1 {
 
 .question {
     margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
 label {
-    display: block;
     margin-bottom: 5px;
 }
 
@@ -50,7 +51,7 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 20px; /* Add space above the button */
+    margin-top: 20px;
 }
 
 button:hover {
@@ -88,3 +89,15 @@ button:hover {
     background: #007bff;
     border-radius: 50%;
 }
+
+.tick-mark {
+    font-size: 20px;
+    color: green;
+    visibility: hidden;
+    margin-top: 5px;
+}
+
+.tick-mark.answered {
+    visibility: visible;
+}
+

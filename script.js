@@ -1,6 +1,8 @@
-let questions = null;
+let allQuestions = null;
+let selectedQuestions = [];
+let totalQuestions = 0;
 document.addEventListener('DOMContentLoaded', (event) => {
-    questions = [
+    allQuestions = [
         { text: "I prefer to spend time alone or with others.", left: "Alone", right: "With others", key: "q1", dimension: 'introversion_extroversion' },
         { text: "I feel more energized by spending time by myself or by being around other people.", left: "By myself", right: "Around other people", key: "q2", dimension: 'introversion_extroversion' },
         { text: "I tend to reflect deeply on my thoughts or seek external stimulation.", left: "Reflect deeply", right: "Seek stimulation", key: "q3", dimension: 'introversion_extroversion' },
@@ -61,36 +63,110 @@ document.addEventListener('DOMContentLoaded', (event) => {
         { text: "I prefer to have a clear to-do list or to tackle tasks as they come.", left: "Clear to-do list", right: "Tackle tasks as they come", key: "q58", dimension: 'perceiving_judging' },
         { text: "I like to have a plan for everything or to be spontaneous and adaptable.", left: "Plan for everything", right: "Spontaneous and adaptable", key: "q59", dimension: 'perceiving_judging' },
         { text: "I feel more comfortable with closure or with keeping options open.", left: "Closure", right: "Keeping options open", key: "q60", dimension: 'perceiving_judging' }
-        
     ];
+    showQuestionOptions();
+});
 
-// Shuffle the questions array
+function showQuestionOptions() {
+    const container = document.getElementById('mbti-container');
+    container.innerHTML = `
+        <h2>How many questions would you like to answer?</h2>
+        <button onclick="selectQuestions(12)">12 Questions</button>
+        <button onclick="selectQuestions(30)">30 Questions</button>
+        <button onclick="selectQuestions(60)">60 Questions</button>
+    `;
+}
+
+function selectQuestions(numQuestions) {
+    totalQuestions = numQuestions;
+    const questionsPerDimension = Math.floor(numQuestions / 4);
+
+    // Group questions by dimension
+    const groupedQuestions = {
+        introversion_extroversion: allQuestions.filter(q => q.dimension === 'introversion_extroversion'),
+        sensing_intuition: allQuestions.filter(q => q.dimension === 'sensing_intuition'),
+        thinking_feeling: allQuestions.filter(q => q.dimension === 'thinking_feeling'),
+        perceiving_judging: allQuestions.filter(q => q.dimension === 'perceiving_judging')
+    };
+
+    // Randomly select questions from each dimension
+    selectedQuestions = [];
+    selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.introversion_extroversion, questionsPerDimension));
+    selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.sensing_intuition, questionsPerDimension));
+    selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.thinking_feeling, questionsPerDimension));
+    selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.perceiving_judging, questionsPerDimension));
+
+    shuffle(selectedQuestions);
+    renderQuestions();
+}
+
+function getRandomQuestions(questionArray, numQuestions) {
+    const shuffled = [...questionArray].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, numQuestions);
+}
+
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
-shuffle(questions);
 
-// Generate HTML for questions
-const form = document.getElementById('mbti-form');
-questions.forEach((q, index) => {
-    const questionHTML = `
-        <div class="question">
-            <label for="${q.key}">${index + 1}. ${q.text}</label>
-            <input type="range" id="${q.key}" name="${q.key}" min="0" max="100" value="50">
-            <div class="range-labels">
-                <span>${q.left}</span>
-                <span>${q.right}</span>
+function renderQuestions() {
+    const container = document.getElementById('mbti-container');
+    container.innerHTML = '<form id="mbti-form"></form>\n<div id="results" class="results"></div>';
+    const form = document.getElementById('mbti-form');
+    
+    selectedQuestions.forEach((q, index) => {
+        const questionHTML = `
+            <div class="question">
+                <label for="${q.key}">${index + 1}. ${q.text}</label>
+                <input type="range" id="${q.key}" name="${q.key}" min="0" max="100" value="50" onclick="markAnswered('${q.key}')">
+                <div class="range-labels">
+                    <span>${q.left}</span>
+                    <span>${q.right}</span>
+                </div>
+                <span id="tick-${q.key}" class="tick-mark"></span>
             </div>
-        </div>
-    `;
-    form.innerHTML += questionHTML;
-});
-});
+        `;
+        form.innerHTML += questionHTML;
+    });
+
+    form.innerHTML += '<button id="submit-button" type="button" onclick="calculateResults()">Submit</button>';
+    document.getElementById('submit-button').disabled = true; // Disable initially
+}
+
+function markAnswered(key) {
+    const tick = document.getElementById(`tick-${key}`);
+    tick.innerHTML = '✔️';
+    tick.classList.add('answered');
+    checkCompletion();
+}
+
+function checkCompletion() {
+    const ticks = document.querySelectorAll('.tick-mark');
+    let allAnswered = true;
+
+    ticks.forEach(tick => {
+        if (!tick.classList.contains('answered')) {
+            allAnswered = false;
+        }
+    });
+
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        submitButton.disabled = !allAnswered;
+    }
+}
 
 function calculateResults() {
+    const resultsElement = document.getElementById('results');
+    console.log(resultsElement); // Check if this logs the correct element
+
+    if (!resultsElement) {
+        console.error("The results element does not exist.");
+        return;
+    }
     const form = document.getElementById('mbti-form');
     const formData = new FormData(form);
 
@@ -109,33 +185,49 @@ function calculateResults() {
         perceiving_judging_total: 0
     };
 
+    // Calculate scores based on the selected questions
     formData.forEach((value, key) => {
-        const question = questions.find(q => q.key === key);
-        scores[`${question.dimension}_total`] += parseFloat(value);
-        scores[`${question.dimension}_n`]++;
-        scores[`${question.dimension}_total`]
+        const question = selectedQuestions.find(q => q.key === key);
+        if (question) {
+            scores[`${question.dimension}_total`] += parseFloat(value);
+            scores[`${question.dimension}_n`]++;
+        }
     });
 
+    // Calculate averages for each dimension
     for (const dimension of ['introversion_extroversion', 'sensing_intuition', 'thinking_feeling', 'perceiving_judging']) {
-        scores[dimension] = scores[`${dimension}_total`] / scores[`${dimension}_n`];
+        
+        if (scores[`${dimension}_n`] > 0) {
+            scores[dimension] = scores[`${dimension}_total`] / scores[`${dimension}_n`];
+        } else {
+            scores[dimension] = 50; // Default to 50 if no questions were answered for a dimension
+        }
     }
-
-    // Debugging output
-    console.log('Scores object:', scores);
 
     const dimensions = [
         { name: 'Introversion', score: scores.introversion_extroversion, opposite: 'Extraversion' },
-        { name: 'Sensing', score: scores.sensing_intuition, opposite: 'Intuition' },
+        { name: 'Intuition', score: scores.sensing_intuition, opposite: 'Sensing' },
         { name: 'Thinking', score: scores.thinking_feeling, opposite: 'Feeling' },
         { name: 'Judging', score: scores.perceiving_judging, opposite: 'Perceiving' }
     ];
 
-    // Determine the MBTI type
-    const mbtiType = (scores.introversion_extroversion > 50 ? 'E' : 'I') +
-                     (scores.sensing_intuition > 50 ? 'S' : 'N') +
-                     (scores.thinking_feeling > 50 ? 'F' : 'T') +
-                     (scores.perceiving_judging > 50 ? 'P' : 'J');
+    let mbtiType = '';
+    let isExactly50 = false;
 
+    // Determine MBTI type and check for balanced dimensions
+    dimensions.forEach(dimension => {
+        if (dimension.score === 50) {
+            isExactly50 = true;
+        }
+        if(dimension.opposite === 'Sensing') {
+            mbtiType += (dimension.score > 50 ? 'S' : 'N');
+        }
+        else{
+            mbtiType += (dimension.score > 50 ? dimension.opposite.charAt(0) : dimension.name.charAt(0));
+        }
+    });
+
+    // Generate the results HTML
     let resultHTML = '<h2>Your Results</h2>';
 
     dimensions.forEach(dimension => {
@@ -154,5 +246,12 @@ function calculateResults() {
     });
 
     resultHTML += `<h3>Your MBTI Type: ${mbtiType}</h3>`;
+
+    if (isExactly50) {
+        resultHTML += `<p>Your results indicate a 50/50 balance in one or more dimensions. This suggests that your type may be somewhere between two types, and further introspection might be necessary to determine your dominant preferences.</p>`;
+    }
+
+    // Display the results
     document.getElementById('results').innerHTML = resultHTML;
 }
+
