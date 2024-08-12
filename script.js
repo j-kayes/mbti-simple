@@ -62,7 +62,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
         { text: "I am more comfortable with predictability or with flexibility.", left: "Predictability", right: "Flexibility", key: "q57", dimension: 'perceiving_judging' },
         { text: "I prefer to have a clear to-do list or to tackle tasks as they come.", left: "Clear to-do list", right: "Tackle tasks as they come", key: "q58", dimension: 'perceiving_judging' },
         { text: "I like to have a plan for everything or to be spontaneous and adaptable.", left: "Plan for everything", right: "Spontaneous and adaptable", key: "q59", dimension: 'perceiving_judging' },
-        { text: "I feel more comfortable with closure or with keeping options open.", left: "Closure", right: "Keeping options open", key: "q60", dimension: 'perceiving_judging' }
+        { text: "I feel more comfortable with closure or with keeping options open.", left: "Closure", right: "Keeping options open", key: "q60", dimension: 'perceiving_judging' },
+        { text: "I enjoy time spent reading or working on something alone, or time spent with constant interation with other people?", left: "Alone", right: "With others", key: "q61", dimension: 'introversion_extroversion' },
+        { text: "I am more guided my by emotions or purely by logic and reason?", left: "Emptions", right: "Logic and reason", key: "q62", dimension: 'thinking_feeling' },
+        { text: "I like to predict what might happen in the future or I prefer to immerse myself in the immediate physical enviroment?", left: "Future predictions", right: "Immediate physical enviroment", key: "q63", dimension: 'sensing_intuition' },
+        { text: "I like to be open to adjusting/adapting my things in as time goes on or to stick to a fixed plan?", left: "Adjusting/adapting", right: "Sticking to a plan", key: "q64", dimension: 'perceiving_judging' }
+
     ];
     showQuestionOptions();
 });
@@ -71,9 +76,9 @@ function showQuestionOptions() {
     const container = document.getElementById('mbti-container');
     container.innerHTML = `
         <h2>How many questions would you like to answer?</h2>
-        <button onclick="selectQuestions(12)">12 Questions</button>
-        <button onclick="selectQuestions(30)">30 Questions</button>
-        <button onclick="selectQuestions(60)">60 Questions</button>
+        <button onclick="selectQuestions(16)">16 Questions</button>
+        <button onclick="selectQuestions(32)">32 Questions</button>
+        <button onclick="selectQuestions(64)">64 Questions</button>
     `;
 }
 
@@ -96,7 +101,11 @@ function selectQuestions(numQuestions) {
     selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.thinking_feeling, questionsPerDimension));
     selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.perceiving_judging, questionsPerDimension));
 
+    for(let i = 0; i < selectedQuestions.length; i++) {
+        console.log(selectedQuestions[i].dimension)
+    }
     shuffle(selectedQuestions);
+
     renderQuestions();
 }
 
