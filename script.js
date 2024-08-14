@@ -125,9 +125,9 @@ function renderQuestions() {
     
     selectedQuestions.forEach((q, index) => {
         const questionHTML = `
-            <div class="question" onclick="markAnswered('${q.key}')">
+            <div class="question">
                 <label for="${q.key}">${index + 1}. ${q.text}</label>
-                <input type="range" id="${q.key}" name="${q.key}" min="0" max="100" value="50" onclick="markAnswered('${q.key}')">
+                <input type="range" id="${q.key}" name="${q.key}" min="0" max="100" value="50" oninput="markAnswered('${q.key}')" onchange="markAnswered('${q.key}')")">
                 <div class="range-labels">
                     <span>${q.left}</span>
                     <span>${q.right}</span>
