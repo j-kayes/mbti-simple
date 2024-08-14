@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         { text: "I am more inclined to be reserved in social settings or outgoing and talkative.", left: "Reserved", right: "Outgoing and talkative", key: "q13", dimension: 'introversion_extroversion' },
         { text: "I enjoy being the center of attention or prefer to stay in the background.", left: "Stay in the background", right: "Center of attention", key: "q14", dimension: 'introversion_extroversion' },
         { text: "I feel more comfortable expressing my thoughts in writing or speaking them out loud.", left: "Writing", right: "Speaking out loud", key: "q15", dimension: 'introversion_extroversion' },
-        { text: "I trust experience more than hunches or I trust hunches more than experience.", left: "Experience", right: "Hunches", key: "q16", dimension: 'sensing_intuition' },
+        { text: "I trust experience more than hunches or I trust hunches more than experience.", left: "Experience", right: "Hunches", key: "q16", dimension: '' },
         { text: "I make decisions based on logic and consistency or I make decisions based on people and special circumstances.", left: "Logic and consistency", right: "People and circumstances", key: "q17", dimension: 'thinking_feeling' },
         { text: "I prioritize efficiency and effectiveness in my work or I prioritize harmony and positive interactions.", left: "Efficiency and effectiveness", right: "Harmony and positive interactions", key: "q18", dimension: 'thinking_feeling' },
         { text: "I prefer to make decisions based on objective criteria or on the impact they will have on others.", left: "Objective criteria", right: "Impact on others", key: "q19", dimension: 'thinking_feeling' },
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         { text: "I enjoy time spent reading or working on something alone, or time spent with constant interation with other people?", left: "Alone", right: "With others", key: "q61", dimension: 'introversion_extroversion' },
         { text: "I am more guided my by emotions or purely by logic and reason?", left: "Emptions", right: "Logic and reason", key: "q62", dimension: 'thinking_feeling' },
         { text: "I like to predict what might happen in the future or I prefer to immerse myself in the immediate physical enviroment?", left: "Future predictions", right: "Immediate physical enviroment", key: "q63", dimension: 'sensing_intuition' },
-        { text: "I like to be open to adjusting/adapting my things in as time goes on or to stick to a fixed plan?", left: "Adjusting/adapting", right: "Sticking to a plan", key: "q64", dimension: 'perceiving_judging' }
+        { text: "I like to be open to adjusting/adapting things in the present or to stick to a fixed plan?", left: "Sticking to a plan", right:"Adjusting/adapting", key: "q64", dimension: 'perceiving_judging' }
 
     ];
     showQuestionOptions();
@@ -101,9 +101,6 @@ function selectQuestions(numQuestions) {
     selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.thinking_feeling, questionsPerDimension));
     selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.perceiving_judging, questionsPerDimension));
 
-    for(let i = 0; i < selectedQuestions.length; i++) {
-        console.log(selectedQuestions[i].dimension)
-    }
     shuffle(selectedQuestions);
 
     renderQuestions();
