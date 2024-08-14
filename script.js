@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         { text: "I am more inclined to be reserved in social settings or outgoing and talkative.", left: "Reserved", right: "Outgoing and talkative", key: "q13", dimension: 'introversion_extroversion' },
         { text: "I enjoy being the center of attention or prefer to stay in the background.", left: "Stay in the background", right: "Center of attention", key: "q14", dimension: 'introversion_extroversion' },
         { text: "I feel more comfortable expressing my thoughts in writing or speaking them out loud.", left: "Writing", right: "Speaking out loud", key: "q15", dimension: 'introversion_extroversion' },
-        { text: "I trust experience more than hunches or I trust hunches more than experience.", left: "Experience", right: "Hunches", key: "q16", dimension: '' },
+        { text: "I trust experience more than hunches or I trust hunches more than experience.", left: "Experience", right: "Hunches", key: "q16", dimension: 'sensing_intuition' },
         { text: "I make decisions based on logic and consistency or I make decisions based on people and special circumstances.", left: "Logic and consistency", right: "People and circumstances", key: "q17", dimension: 'thinking_feeling' },
         { text: "I prioritize efficiency and effectiveness in my work or I prioritize harmony and positive interactions.", left: "Efficiency and effectiveness", right: "Harmony and positive interactions", key: "q18", dimension: 'thinking_feeling' },
         { text: "I prefer to make decisions based on objective criteria or on the impact they will have on others.", left: "Objective criteria", right: "Impact on others", key: "q19", dimension: 'thinking_feeling' },
@@ -101,8 +101,8 @@ function selectQuestions(numQuestions) {
     selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.thinking_feeling, questionsPerDimension));
     selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.perceiving_judging, questionsPerDimension));
 
+    console.log(groupedQuestions)
     shuffle(selectedQuestions);
-
     renderQuestions();
 }
 
