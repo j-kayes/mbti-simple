@@ -1,5 +1,6 @@
 let allQuestions = null;
 let selectedQuestions = [];
+let unansweredQuestions = [];
 let totalQuestions = 0;
 document.addEventListener('DOMContentLoaded', (event) => {
     allQuestions = [
@@ -101,7 +102,6 @@ function selectQuestions(numQuestions) {
     selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.thinking_feeling, questionsPerDimension));
     selectedQuestions = selectedQuestions.concat(getRandomQuestions(groupedQuestions.perceiving_judging, questionsPerDimension));
 
-    console.log(groupedQuestions)
     shuffle(selectedQuestions);
     renderQuestions();
 }
@@ -124,10 +124,12 @@ function renderQuestions() {
     const form = document.getElementById('mbti-form');
     
     selectedQuestions.forEach((q, index) => {
+        const questionNumber = index + 1;
+        unansweredQuestions.push(questionNumber); // Add all questions to the list initially
         const questionHTML = `
             <div class="question">
                 <label for="${q.key}">${index + 1}. ${q.text}</label>
-                <input type="range" id="${q.key}" name="${q.key}" min="0" max="100" value="50" oninput="markAnswered('${q.key}')" onchange="markAnswered('${q.key}')")">
+                <input type="range" id="${q.key}" name="${q.key}" min="0" max="100" value="50" oninput="markAnswered('${q.key}', ${questionNumber})" onchange="markAnswered('${q.key}', ${questionNumber})">
                 <div class="range-labels">
                     <span>${q.left}</span>
                     <span>${q.right}</span>
@@ -139,40 +141,37 @@ function renderQuestions() {
     });
 
     form.innerHTML += '<button id="submit-button" type="button" onclick="calculateResults()">Submit</button>';
-    document.getElementById('submit-button').disabled = true; // Disable initially
+    //document.getElementById('submit-button').disabled = true; // Disable initially
 }
 
-function markAnswered(key) {
+
+function markAnswered(key, questionNumber) {
     const tick = document.getElementById(`tick-${key}`);
     tick.innerHTML = '✔️';
     tick.classList.add('answered');
-    checkCompletion();
-}
 
-function checkCompletion() {
-    const ticks = document.querySelectorAll('.tick-mark');
-    let allAnswered = true;
-
-    ticks.forEach(tick => {
-        if (!tick.classList.contains('answered')) {
-            allAnswered = false;
-        }
-    });
-
-    const submitButton = document.getElementById('submit-button');
-    if (submitButton) {
-        submitButton.disabled = !allAnswered;
+    // Remove the answered question from the list
+    const index = unansweredQuestions.indexOf(questionNumber);
+    if (index !== -1) {
+        unansweredQuestions.splice(index, 1);
     }
 }
 
 function calculateResults() {
     const resultsElement = document.getElementById('results');
-    console.log(resultsElement); // Check if this logs the correct element
-
     if (!resultsElement) {
         console.error("The results element does not exist.");
         return;
     }
+    if (unansweredQuestions.length > 0) {
+        // Display the list of unanswered questions in the HTML
+        let resultHTML = '<h2>Your Results</h2>';
+        resultHTML += `<p>Please answer the following questions before submitting:</p>`;
+        resultHTML += `<p>Unanswered Questions: ${unansweredQuestions.join(', ')}</p>`;
+        resultsElement.innerHTML = resultHTML;
+        return; // Exit the function if there are unanswered questions
+    }
+
     const form = document.getElementById('mbti-form');
     const formData = new FormData(form);
 
@@ -202,7 +201,6 @@ function calculateResults() {
 
     // Calculate averages for each dimension
     for (const dimension of ['introversion_extroversion', 'sensing_intuition', 'thinking_feeling', 'perceiving_judging']) {
-        
         if (scores[`${dimension}_n`] > 0) {
             scores[dimension] = scores[`${dimension}_total`] / scores[`${dimension}_n`];
         } else {
@@ -225,10 +223,9 @@ function calculateResults() {
         if (dimension.score === 50) {
             isExactly50 = true;
         }
-        if(dimension.opposite === 'Sensing') {
+        if (dimension.opposite === 'Sensing') {
             mbtiType += (dimension.score > 50 ? 'S' : 'N');
-        }
-        else{
+        } else {
             mbtiType += (dimension.score > 50 ? dimension.opposite.charAt(0) : dimension.name.charAt(0));
         }
     });
@@ -258,6 +255,5 @@ function calculateResults() {
     }
 
     // Display the results
-    document.getElementById('results').innerHTML = resultHTML;
+    resultsElement.innerHTML = resultHTML;
 }
-
